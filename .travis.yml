@@ -4,15 +4,17 @@ sudo: true
 branches:
   only:
     - master
+    - travisConfig
 
 node_js:
-  - "12"
+  - "10"
 
 before_install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.2
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
   - export PATH=$HOME/.yarn/bin:$PATH
-  - apt install pcscd libpcsclite-dev
-  - npm install pkg
+  - sudo apt-get update -qq
+  - sudo apt install -y pcscd libpcsclite-dev libpcsclite1
+  - npm install -g pkg
 
 cache:
   yarn: true
@@ -22,13 +24,13 @@ script:
 before_deploy:
   - pkg scarlet.js
 deploy:
-     provider: releases
-     api_key:
-         secure: cbd8eb6aae1fcd62013d86294a4b02d2830aabe1
-     file:
-         - scarlet-linux
-         - scarlet-macos
-         - scarlet-win.exe
-     skip_cleanup: true
-     on:
-         branch: travisConfig
+  provider: releases
+  api_key:
+    secure: cbd8eb6aae1fcd62013d86294a4b02d2830aabe1
+  file:
+    - scarlet-linux
+    - scarlet-macos
+    - scarlet-win.exe
+  skip_cleanup: true
+  on:
+    branch: travisConfig
