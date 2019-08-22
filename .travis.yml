@@ -26,7 +26,7 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: cbd8eb6aae1fcd62013d86294a4b02d2830aabe1
+    secure: 5b10c907c68a9596acfcfab3a3eddbbcdadb76a0
   file:
     - scarlet-linux
     - scarlet-macos
