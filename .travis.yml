@@ -9,8 +9,9 @@ node_js:
   - "12"
 
 before_install:
-  #- curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.2
-  #- export PATH=$HOME/.yarn/bin:$PATH
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.2
+  - export PATH=$HOME/.yarn/bin:$PATH
+  - apt install pcscd libpcsclite-dev
   - npm install pkg
 
 cache:
