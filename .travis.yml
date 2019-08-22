@@ -3,7 +3,6 @@ sudo: true
 branches:
   only:
   - master
-  - travisConfig
 node_js:
 - '10'
 before_install:
