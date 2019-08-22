@@ -1,4 +1,7 @@
-# scarlet
+# scarlet [![Build Status](https://travis-ci.com/cesar-richard/scarlet.svg?branch=master)](https://travis-ci.com/cesar-richard/scarlet)
+
+Interface between physic devices (like ACR122U NFC Reader) and websockets subscribers (like React apps)
+
 Binaries availiable at :
 
 | OS      | Binary                                                                                               |
