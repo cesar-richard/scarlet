@@ -1,0 +1,18 @@
+{
+  "name": "scarlet",
+  "version": "1.0.0",
+  "description": "Communication program between physic interfaces (NFC,...) and react apps",
+  "main": "index.js",
+  "repository": "git@github.com:cesar-richard/scarlet.git",
+  "author": "César Richard <cesar.richard@weezevent.com>",
+  "license": "CC-BY-NC-ND-4.0",
+  "private": false,
+  "dependencies": {
+    "nfc-pcsc": "^0.7.4",
+    "socket.io": "^2.2.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "pkg index.js"
+  }
+}
