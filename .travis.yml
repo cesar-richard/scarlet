@@ -2,21 +2,21 @@ language: node_js
 sudo: true
 branches:
   only:
-  - master
+    - master
 node_js:
-- '10'
+  - "10"
 before_install:
-- curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
-- export PATH=$HOME/.yarn/bin:$PATH
-- sudo apt-get update -qq
-- sudo apt install -y pcscd libpcsclite-dev libpcsclite1
-- npm install -g pkg
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
+  - export PATH=$HOME/.yarn/bin:$PATH
+  - sudo apt-get update -qq
+  - sudo apt install -y pcscd libpcsclite-dev libpcsclite1
+  - npm install -g pkg
 cache:
   yarn: true
 script:
-- export NODE_ENV=production
+  - export NODE_ENV=production
 before_deploy:
-- pkg scarlet.js
+  - pkg scarlet.js
 deploy:
   provider: releases
   skip_cleanup: true
