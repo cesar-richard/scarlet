@@ -1,0 +1,32 @@
+language: node_js
+sudo: true
+branches:
+  only:
+  - master
+  - travisConfig
+node_js:
+- '10'
+before_install:
+- curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
+- export PATH=$HOME/.yarn/bin:$PATH
+- sudo apt-get update -qq
+- sudo apt install -y pcscd libpcsclite-dev libpcsclite1
+- npm install -g pkg
+cache:
+  yarn: true
+script:
+- export NODE_ENV=production
+before_deploy:
+- pkg scarlet.js
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: YWot+uiUjiuyuYB34IB2ksWuoYV2b7JJV/tfykdMneI54gxZnp/CGdVelkYO4d7fIlmLkU2xDMtB9yTcTZErznVI51RW26BthEYOQc1dfXW6MUM+r30l2GzgQzdaq1GPB45qUckIaERxVIoGF4eccafhrZQaNpQsvNQ2gCq6Gn1KeLx8l+6+u5tefmrtLbvk83pcI9YD4Hc0ASaPbkHDoLy9k6kZjkJXG+bqX9la2YzwkC3lkXjrqX5BYGroY4//ANAzNYNbb9xR6BpMRpmu1raX/07W1JctdMopi2vwMtYktQ5QK3+2ZhwD/83SPqINM8fjibZdrnNMPHKLFm03cdgRJaBKBkn9v4gN3zMP1NQSUKhrtoIG+lGWEr8/wyPIcSmtDlVTXOLfDmt7NK/r7OqROqPOyiBXG0xMnz900O5Xzx1WZ817tPH3aqfcyKqDrrwDty0mBFn/ZoAVMoWhDjBpzJY8F6r2xKWj41DPZouH+6HakGyHQhIS1683aVdlSR29npvXwp6NFG4AwKKz8UHwyAjsuTdkLnmKrX1JmpBKrZrpHEMYcDz/3hXIWrgkjDXEEwH/VGL0BZk/glKG2hitG/XwnC+RpXAcIctR0rgnVrIqT2PFP4ZPS1JIGxncLYai4o9Vr+qQ2+cLsengcBmW0kwWOelUW34k8eyUEA8=
+  file:
+    - scarlet-win.exe
+    - scarlet-linux
+    - scarlet-macos
+  on:
+    repo: cesar-richard/scarlet
+    branch: master
