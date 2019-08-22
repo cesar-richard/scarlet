@@ -2,17 +2,30 @@
   "name": "scarlet",
   "version": "1.0.0",
   "description": "Communication program between physic interfaces (NFC,...) and react apps",
-  "main": "scarlet.js",
+  "main": "src/scarlet.js",
+  "bin": "src/scarlet.js",
   "repository": "git@github.com:cesar-richard/scarlet.git",
   "author": "César Richard <cesar.richard@weezevent.com>",
   "license": "CC-BY-NC-ND-4.0",
   "private": false,
   "dependencies": {
+    "chalk": "^2.4.2",
     "nfc-pcsc": "^0.7.4",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "triple-beam": "^1.3.0",
+    "winston": "^3.2.1"
   },
   "scripts": {
-    "start": "node scarlet.js",
-    "build": "pkg scarlet.js"
+    "start": "node src/scarlet.js",
+    "build": "pkg .",
+    "lint": "./node_modules/.bin/eslint ./src/"
+  },
+  "devDependencies": {
+    "eslint": "^6.2.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }
