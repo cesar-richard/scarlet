@@ -15,8 +15,9 @@ cache:
   yarn: true
 script:
 - export NODE_ENV=production
+- yarn lint
 before_deploy:
-- pkg scarlet.js
+- yarn build
 deploy:
   provider: releases
   skip_cleanup: true
