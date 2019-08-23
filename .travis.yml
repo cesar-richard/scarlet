@@ -18,7 +18,7 @@ script:
 - yarn
 - export NODE_ENV=production
 - yarn lint
-- ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+- yarn codecov
 - codecov
 before_deploy:
 - yarn build
