@@ -11,13 +11,14 @@ before_install:
 - sudo apt-get update -qq
 - sudo apt install -y pcscd libpcsclite-dev libpcsclite1
 install:
-- npm install -g pkg codecov istanbul
+- npm install -g pkg codecov
 cache:
   yarn: true
 script:
+- yarn
 - export NODE_ENV=production
 - yarn lint
-- istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+- ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
 - codecov
 before_deploy:
 - yarn build
