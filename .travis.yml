@@ -29,3 +29,4 @@ deploy:
   on:
     repo: cesar-richard/scarlet
     branch: master
+  name: Release ${TRAVIS_BUILD_NUMBER} ($(date +'%d.%m.%Y %R'))
