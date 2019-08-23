@@ -15,9 +15,10 @@ install:
 cache:
   yarn: true
 script:
+- yarn
 - export NODE_ENV=production
 - yarn lint
-- istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+- ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
 - codecov
 before_deploy:
 - yarn build
