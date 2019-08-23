@@ -18,7 +18,7 @@
   "scripts": {
     "start": "node src/scarlet.js",
     "build": "pkg .",
-    "lint": "./node_modules/.bin/eslint ./**/*.js",
+    "lint": "./node_modules/.bin/eslint ./src/**/*.js",
     "codecov": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --reporter test -- -R spec"
   },
   "devDependencies": {
