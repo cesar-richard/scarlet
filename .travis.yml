@@ -10,11 +10,15 @@ before_install:
   - export PATH=$HOME/.yarn/bin:$PATH
   - sudo apt-get update -qq
   - sudo apt install -y pcscd libpcsclite-dev libpcsclite1
-  - npm install -g pkg
+install:
+  - npm install -g pkg codecov
 cache:
   yarn: true
 script:
   - export NODE_ENV=production
+  - yarn lint
+  - ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+  - codecov
 before_deploy:
   - pkg scarlet.js
 deploy:
