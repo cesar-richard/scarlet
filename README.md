@@ -1,4 +1,4 @@
-# scarlet [![Build Status](https://travis-ci.com/cesar-richard/scarlet.svg?branch=master)](https://travis-ci.com/cesar-richard/scarlet)
+# scarlet [![Build Status](https://travis-ci.com/cesar-richard/scarlet.svg?branch=master)](https://travis-ci.com/cesar-richard/scarlet) [![Maintainability](https://api.codeclimate.com/v1/badges/add2cd9a14931371621d/maintainability)](https://codeclimate.com/github/cesar-richard/scarlet/maintainability)
 
 Interface between physic devices (like ACR122U NFC Reader) and websockets subscribers (like React apps)
 
