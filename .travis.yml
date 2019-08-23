@@ -10,6 +10,7 @@ before_install:
 - export PATH=$HOME/.yarn/bin:$PATH
 - sudo apt-get update -qq
 - sudo apt install -y pcscd libpcsclite-dev libpcsclite1
+- alias istanbul="./node_modules/istanbul/lib/cli.js"
 install:
 - npm install -g pkg codecov
 cache:
