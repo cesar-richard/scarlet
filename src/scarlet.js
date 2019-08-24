@@ -5,11 +5,17 @@ const io = require('socket.io')(PORT);
 const logger = require('./logger');
 
 const nfc = new NFC(logger);
+const nfcState = {
+  reader: null,
+  connected: false,
+};
 logger.info('Listening on port ', PORT);
 
 nfc.on('reader', (reader) => {
   logger.info(`${reader.reader.name}  device attached`);
-
+  nfcState.connected = true;
+  nfcState.reader = reader.reader;
+  io.emit('start', reader.reader.name);
   // enable when you want to auto-process ISO 14443-4 tags (standard=TAG_ISO_14443_4)
   // when an ISO 14443-4 is detected, SELECT FILE command with the AID is issued
   // the response is available as card.data in the card event
@@ -38,7 +44,9 @@ nfc.on('reader', (reader) => {
   });
 
   reader.on('end', () => {
-    io.emit('end', reader.reader.name);
+    nfcState.connected = false;
+    nfcState.reader = null;
+    io.emit('end');
     logger.info(`${reader.reader.name}  device removed`);
   });
 });
@@ -50,6 +58,11 @@ nfc.on('error', (err) => {
 
 io.on('connection', (client) => {
   logger.info('client connected');
+  if (nfcState.connected) {
+    io.emit('start', nfcState.reader.name);
+  } else {
+    io.emit('end');
+  }
   client.on('subscribeToNFC', () => {
     logger.info('client is subscribing to NFC events');
   });
