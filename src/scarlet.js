@@ -23,7 +23,7 @@ nfc.on('reader', (reader) => {
     // [always] String standard: same as type
     // [only TAG_ISO_14443_3] String uid: tag uid
     // [only TAG_ISO_14443_4] Buffer data: raw data from select APDU response
-    io.emit('detected', card);
+    io.emit('card', card);
     logger.info(`${reader.reader.name}  card detected`, card);
   });
 
@@ -38,7 +38,7 @@ nfc.on('reader', (reader) => {
   });
 
   reader.on('end', () => {
-    io.emit('detected', reader.reader.name);
+    io.emit('end', reader.reader.name);
     logger.info(`${reader.reader.name}  device removed`);
   });
 });
