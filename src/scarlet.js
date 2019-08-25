@@ -39,8 +39,8 @@ nfc.on('reader', (reader) => {
   });
 
   reader.on('error', (err) => {
-    io.emit('error', err);
-    logger.info(`${reader.reader.name}  an error occurred`, err);
+    io.emit('error', err.toString());
+    logger.error(`READER ${reader.reader.name} an error occurred`, err.toString());
   });
 
   reader.on('end', () => {
@@ -51,9 +51,9 @@ nfc.on('reader', (reader) => {
   });
 });
 
-nfc.on('error', (err) => {
-  io.emit('nfcerror', err);
-  logger.info('an error occurred', err);
+nfc.on('nfcerror', (err) => {
+  io.emit('error', err.toString());
+  logger.error('an error occurred', err.toString());
 });
 
 io.on('connection', (client) => {
