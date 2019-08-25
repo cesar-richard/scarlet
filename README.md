@@ -14,8 +14,8 @@ Binaries availiable at :
 | Linux   | [scarlet-linux](https://github.com/cesar-richard/scarlet/releases/latest/download/scarlet-linux)     |
 
 
-##Troubleshooting
+## Troubleshooting
 
 There's a known issue with npm & python setup on Windows. Ensure thath Python in installed and if it still doesn't want to compile try:
 
-npm --add-python-to-path='true' --debug install --global windows-build-tools
+``` npm --add-python-to-path='true' --debug install --global windows-build-tools ```
