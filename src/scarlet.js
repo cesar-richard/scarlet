@@ -1,4 +1,4 @@
-const { NFC } = require('nfc-pcsc');
+const { NFC, KEY_TYPE_A, KEY_TYPE_B } = require('nfc-pcsc');
 
 const PORT = process.env.SOCKETPORT || 3001;
 const io = require('socket.io')(PORT);
@@ -8,7 +8,32 @@ const nfc = new NFC(logger);
 const nfcState = {
   reader: null,
   connected: false,
+  mode: 'reader',
 };
+const ereaseWallet = (reader) => {
+  nfcState.mode = 'reader';
+  logger.info('client is requesting Wallet ereasing');
+  const block = 28;
+  reader.authenticate(block, KEY_TYPE_A, 'A0A1A2A3A4A5')
+    .then((data) => {
+      logger.info(`Auth A OK  ${data}`);
+      reader.authenticate(block, KEY_TYPE_B, 'D7D8D9DADBDC').then((data2) => {
+        logger.info(`AUTH B OK ${data2}`);
+        const binary = Buffer.allocUnsafe(16);
+        binary.fill(0);
+        reader.write(block, binary, binary.length)
+          .then((dataB) => {
+            logger.info(`Write ${dataB}`);
+            reader.read(block, 16)
+              .then((dataAB) => logger.info(`Post write read ${dataAB}`))
+              .catch((err3) => logger.error(`yo read ${err3}`));
+          })
+          .catch((err2) => logger.error(`Error writing wallet ${err2}`));
+      }).catch(logger.error);
+    })
+    .catch((err) => logger.error(`AUTH A ERR ${err}`));
+};
+
 logger.info('Listening on port ', PORT);
 
 nfc.on('reader', (reader) => {
@@ -29,6 +54,9 @@ nfc.on('reader', (reader) => {
     // [always] String standard: same as type
     // [only TAG_ISO_14443_3] String uid: tag uid
     // [only TAG_ISO_14443_4] Buffer data: raw data from select APDU response
+    if (nfcState.mode === 'erease') {
+      ereaseWallet(reader);
+    }
     io.emit('card', card);
     logger.info(`${reader.reader.name}  card detected`, card);
   });
@@ -65,5 +93,8 @@ io.on('connection', (client) => {
   }
   client.on('subscribeToNFC', () => {
     logger.info('client is subscribing to NFC events');
+  });
+  client.on('ereaseWallet', () => {
+    nfcState.mode = 'erease';
   });
 });
