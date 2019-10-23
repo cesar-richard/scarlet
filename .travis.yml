@@ -11,7 +11,8 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt install -y pcscd libpcsclite-dev libpcsclite1
 install:
-  - npm install -g pkg codecov
+  - yarn
+  - yarn add -g pkg codecov
 cache:
   yarn: true
 script:
