@@ -2,7 +2,10 @@ const { NFC, KEY_TYPE_A, KEY_TYPE_B } = require('nfc-pcsc');
 
 const PORT = process.env.SOCKETPORT || 3001;
 const io = require('socket.io')(PORT);
+const Sentry = require('@sentry/node');
 const logger = require('./logger');
+
+Sentry.init({ dsn: 'https://84064b30c0fe49abb7feb8baea032ca9@sentry.io/1793383' });
 
 const nfc = new NFC(logger);
 const nfcState = {
