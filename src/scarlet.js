@@ -43,6 +43,8 @@ const nfcState = {
   connected: false,
   mode: 'reader',
 };
+const gillConfig = {};
+
 const ereaseWallet = (reader) => {
   nfcState.mode = 'reader';
   logger.info('client is requesting Wallet ereasing');
@@ -174,5 +176,9 @@ io.on('connection', (client) => {
     logger.debug('Erease mode');
     logger.info('Erease mode');
     nfcState.mode = 'erease';
+  });
+  client.on('systemConfig', (config) => {
+    logger.debug('Got gill system config');
+    Object.assign(gillConfig, config);
   });
 });
