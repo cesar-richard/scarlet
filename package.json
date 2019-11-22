@@ -11,6 +11,7 @@
   "dependencies": {
     "@sentry/node": "^5.7.1",
     "chalk": "^2.4.2",
+    "crypto-js": "^3.1.9-1",
     "nfc-pcsc": "^0.7.4",
     "nyc": "^14.1.1",
     "socket.io": "^2.2.0",
@@ -19,6 +20,7 @@
   },
   "scripts": {
     "start": "node src/scarlet.js",
+    "dev": "node_modules/nodemon/bin/nodemon.js src/scarlet.js",
     "build": "pkg .",
     "lint": "./node_modules/.bin/eslint ./src/**/*.js",
     "codecov": "./ node_modules/nyc/bin/nyc.js ./node_modules/mocha/bin/_mocha --reporter test -- -R spec"
@@ -26,10 +28,13 @@
   "devDependencies": {
     "eslint": "^6.2.1",
     "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-standard-jsx": "^8.1.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^9.1.0",
     "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-standard": "^4.0.1",
-    "mocha": "^6.2.0"
+    "mocha": "^6.2.0",
+    "nodemon": "^1.19.4"
   }
 }
