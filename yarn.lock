@@ -89,13 +89,13 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@pokusew/pcsclite@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@pokusew/pcsclite/-/pcsclite-0.5.2.tgz#d5387251441e5a6b70337a8c66101514273a52e6"
-  integrity sha512-Pmu3aIJBk8vrtxHAxyEA54FhsVDShqzr/tvya0c0TS4vOgWjcz0EhOYIWPzkvI8wjcqab3VHQJm5DGt55Ln5Tw==
+"@pokusew/pcsclite@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@pokusew/pcsclite/-/pcsclite-0.6.0.tgz#30ae3fbf9d1137f2a1b343c32cd8569be581ba2d"
+  integrity sha512-jX7zRXM2Or5Pms1AFjNtawsXDjLiZOzOUo7Sf0put7Pnq/EKIR9g0KvTx62HtwdPpVP6hWHGydUTHgIi9PxodQ==
   dependencies:
-    bindings "^1.4.0"
-    nan "^2.12.1"
+    bindings "^1.5.0"
+    nan "^2.14.0"
 
 "@sentry/core@5.7.1":
   version "5.7.1"
@@ -387,7 +387,7 @@ binary-extensions@^1.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.13.1.tgz#598afe54755b2868a5330d2aff9d4ebb53209b65"
   integrity sha512-Un7MIEDdUC5gNpcGDV97op1Ywk748MpHcFTHoYs6qnj1Z3j7I53VG3nwZhKzoBZmbdRNnb6WRdFlwl7tSDuZGw==
 
-bindings@^1.4.0:
+bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
@@ -2371,6 +2371,11 @@ nan@^2.12.1:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
 
+nan@^2.14.0:
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.15.0.tgz#3f34a473ff18e15c1b5626b62903b5ad6e665fee"
+  integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
+
 nanomatch@^1.2.9:
   version "1.2.13"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.13.tgz#b87a8aa4fc0de8fe6be88895b38983ff265bd119"
@@ -2417,12 +2422,12 @@ nested-error-stacks@^2.0.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"
   integrity sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
 
-nfc-pcsc@^0.7.4:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/nfc-pcsc/-/nfc-pcsc-0.7.4.tgz#1c587c383f1f6aac3a7a0f71f727d899a8c089d1"
-  integrity sha512-XprBgVQt+qH+Q5HStOikbYlAPHBQOxPj8PXLifKrLCfiLzq0p5aExjM0qqX+KTfz8WiHnJi1uH5CBwc4pityOw==
+nfc-pcsc@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/nfc-pcsc/-/nfc-pcsc-0.8.1.tgz#76882be17842cb832a72b76345e665c8108ff049"
+  integrity sha512-wEfacG0dwPVZOG/WY28Mk3P4Q+yz6q7LnjpnZvdFddx3iXavEXiGhftRZXBtudr0NrzH1MrGWSkWq77tef7BMA==
   dependencies:
-    "@pokusew/pcsclite" "^0.5.2"
+    "@pokusew/pcsclite" "^0.6.0"
 
 nice-try@^1.0.4:
   version "1.0.5"
