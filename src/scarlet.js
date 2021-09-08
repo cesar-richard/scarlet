@@ -1,4 +1,4 @@
-const { NFC, KEY_TYPE_A, KEY_TYPE_B } = require("nfc-pcsc");
+const { NFC } = require("nfc-pcsc");
 
 const PORT = process.env.SOCKETPORT || 3001;
 const io = require("socket.io")(PORT);
@@ -63,19 +63,21 @@ nfc.on("reader", reader => {
           default:
             throw new "UNKNOWN card type"();
         }
-        logger.error(JSON.stringify(authConfig));
         if (nfcState.mode === "erease") {
-          nfcState.mode = "reader";
+          //nfcState.mode = "reader";
           cardHandler
             .authenticate(authConfig)
-            .then(() =>
-              cardHandler.reset(authConfig).then(data => {
-                cardHandler
-                  .fastRead(authConfig.startPage, authConfig.endPage)
-                  .then(data => logger.info("reset succeed ", data))
-                  .catch(warn => logger.error("reset failed ", warn));
-              })
-            )
+            .then(() => {
+              cardHandler
+                .reset(authConfig)
+                .then(data => {
+                  cardHandler
+                    .fastRead(authConfig.startPage, authConfig.endPage)
+                    .then(data => logger.info("reset succeed ", data))
+                    .catch(warn => logger.error("reset failed ", warn));
+                })
+                .catch(e => logger.error);
+            })
             .catch(e => logger.error);
         }
         io.emit("card", card);
