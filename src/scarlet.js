@@ -5,6 +5,7 @@ const io = require("socket.io")(PORT);
 const Sentry = require("@sentry/node");
 const MifareUltralight = require("./Cards/MifareUltralight");
 const MifareClassic4K = require("./Cards/MifareClassic4K");
+const MifareDesfire = require("./Cards/MifareDesfire");
 const Helpers = require("./Cards/helpers");
 const logger = require("./logger");
 
@@ -12,53 +13,56 @@ Sentry.init({
   dsn: "https://84064b30c0fe49abb7feb8baea032ca9@sentry.io/1793383"
 });
 
-const helpers = new Helpers();
+//const helpers = new Helpers();
 const nfc = new NFC(logger);
 const nfcState = {
   reader: null,
   connected: false,
-  mode: "erease"
+  mode: "reader"
 };
 let cardHandler = null;
 const gillConfig = {};
 
 nfc.on("reader", reader => {
-  logger.info(`${reader.reader.name}  device attached`);
+  reader.aid = "F222222222";
+  logger.error(`${reader.reader.name}  device attached`);
   nfcState.connected = true;
   nfcState.reader = reader.reader;
   io.emit("start", reader.reader.name);
-  const ultralight = new MifareUltralight(reader);
-  const classic4K = new MifareClassic4K(reader);
+  // const ultralight = new MifareUltralight(reader);
+  // const classic4K = new MifareClassic4K(reader);
 
   reader.on("card", card => {
     let authConfig = {};
+    logger.error(JSON.stringify(card));
+    MifareDesfire.getModel(reader).then(x => logger.error("Cesar " + x));
     Helpers.getCardModel(reader)
       .then(model => {
         Object.assign(card, { model });
         switch (model.type) {
           case "ULTRALIGHT":
             cardHandler = ultralight;
-            if (!gillConfig.offline_ev1password)
-              throw new "Not yet got gill config"();
-            authConfig = {
-              startPage: 0x04,
-              endPage: 0x0f
-            };
-            Object.assign(
-              authConfig,
-              Helpers.computeEV1PassAndPack(
-                card.uid,
-                gillConfig.offline_ev1password
-              )
-            );
+            // if (!gillConfig.offline_ev1password)
+            //   throw new "Not yet got gill config"();
+            // authConfig = {
+            //   startPage: 0x04,
+            //   endPage: 0x0f
+            // };
+            // Object.assign(
+            //   authConfig,
+            //   Helpers.computeEV1PassAndPack(
+            //     card.uid,
+            //     gillConfig.offline_ev1password
+            //   )
+            // );
             break;
           case "MIFARE":
             cardHandler = classic4K;
-            authConfig = {
-              block: 28,
-              keyA: "A0A1A2A3A4A5",
-              keyB: "D7D8D9DADBDC"
-            };
+            // authConfig = {
+            //   block: 28,
+            //   keyA: "A0A1A2A3A4A5",
+            //   keyB: "D7D8D9DADBDC"
+            // };
             break;
           default:
             throw new "UNKNOWN card type"();
@@ -79,8 +83,24 @@ nfc.on("reader", reader => {
                 .catch(e => logger.error);
             })
             .catch(e => logger.error);
+          throw "UNKNOWN card type " + model;
         }
+        // if (nfcState.mode === "erease") {
+        //   nfcState.mode = "reader";
+        //   cardHandler
+        //     .authenticate(authConfig)
+        //     .then(() =>
+        //       cardHandler.reset(authConfig).then(data => {
+        //         cardHandler
+        //           .fastRead(authConfig.startPage, authConfig.endPage)
+        //           .then(data => logger.info("reset succeed ", data))
+        //           .catch(warn => logger.error("reset failed ", warn));
+        //       })
+        //     )
+        //     .catch(e => logger.error);
+        // }
         io.emit("card", card);
+        logger.error(card);
       })
       .catch(error => logger.error("GET OLD : ", error));
   });
