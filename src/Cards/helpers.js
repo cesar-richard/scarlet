@@ -14,7 +14,7 @@ module.exports = class Helper {
     };
   }
 
-  static async getCardModel(reader) {
+  static async getCardModel({ reader, card }) {
     let cardModel = {};
     const x = await reader.transmit(
       Buffer.from([0xff, 0x00, 0x00, 0x00, 0x03, 0xd4, 0x42, 0x60]),
@@ -52,6 +52,10 @@ module.exports = class Helper {
       // TODO : FIX ? CHECK ?
       cardModel.type = "MIFARE";
       cardModel.name = "MIFARE4K?";
+      if (card.type === "TAG_ISO_14443_4") {
+        cardModel.type = "MIFARE_DESFIRE";
+        cardModel.name = "DESFIRE_EV2";
+      }
     } else {
       cardModel.type = "UNKNOWN";
       cardModel.name = "UNKNOWN";
