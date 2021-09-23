@@ -31,11 +31,11 @@ nfc.on("reader", reader => {
   io.emit("start", reader.reader.name);
   const ultralight = new MifareUltralight(reader);
   const classic4K = new MifareClassic4K(reader);
+  const desfire = new MifareDesfire(reader);
 
   reader.on("card", card => {
     let authConfig = {};
-    MifareDesfire.getModel(reader).then(x => logger.error("Cesar " + x));
-    Helpers.getCardModel(reader)
+    Helpers.getCardModel({ reader, card })
       .then(model => {
         Object.assign(card, { model });
         switch (model.type) {
@@ -62,6 +62,9 @@ nfc.on("reader", reader => {
             //   keyA: "A0A1A2A3A4A5",
             //   keyB: "D7D8D9DADBDC"
             // };
+            break;
+          case "MIFARE_DESFIRE":
+            cardHandler = desfire;
             break;
           default:
             throw new "UNKNOWN card type"();
@@ -99,7 +102,7 @@ nfc.on("reader", reader => {
         //     .catch(e => logger.error);
         // }
         io.emit("card", card);
-        logger.error(card);
+        logger.error(JSON.stringify(card));
       })
       .catch(error => logger.error("GET OLD : ", error));
   });
