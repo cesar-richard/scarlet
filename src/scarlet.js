@@ -29,12 +29,11 @@ nfc.on("reader", reader => {
   nfcState.connected = true;
   nfcState.reader = reader.reader;
   io.emit("start", reader.reader.name);
-  // const ultralight = new MifareUltralight(reader);
-  // const classic4K = new MifareClassic4K(reader);
+  const ultralight = new MifareUltralight(reader);
+  const classic4K = new MifareClassic4K(reader);
 
   reader.on("card", card => {
     let authConfig = {};
-    logger.error(JSON.stringify(card));
     MifareDesfire.getModel(reader).then(x => logger.error("Cesar " + x));
     Helpers.getCardModel(reader)
       .then(model => {
