@@ -13,8 +13,7 @@ Sentry.init({
   dsn: "https://84064b30c0fe49abb7feb8baea032ca9@sentry.io/1793383"
 });
 
-//const helpers = new Helpers();
-const nfc = new NFC(logger);
+const nfc = new NFC();
 const nfcState = {
   reader: null,
   connected: false,
@@ -36,41 +35,40 @@ nfc.on("reader", reader => {
   reader.on("card", card => {
     let authConfig = {};
     Helpers.getCardModel({ reader, card })
-      .then(model => {
-        Object.assign(card, { model });
-        switch (model.type) {
+      .then(card => {
+        switch (card.model.type) {
           case "ULTRALIGHT":
             cardHandler = ultralight;
-            // if (!gillConfig.offline_ev1password)
-            //   throw new "Not yet got gill config"();
-            // authConfig = {
-            //   startPage: 0x04,
-            //   endPage: 0x0f
-            // };
-            // Object.assign(
-            //   authConfig,
-            //   Helpers.computeEV1PassAndPack(
-            //     card.uid,
-            //     gillConfig.offline_ev1password
-            //   )
-            // );
+            if (!gillConfig.offline_ev1password)
+              throw new "Not yet got gill config"();
+            authConfig = {
+              startPage: 0x04,
+              endPage: 0x0f
+            };
+            Object.assign(
+              authConfig,
+              Helpers.computeEV1PassAndPack(
+                card.uid,
+                gillConfig.offline_ev1password
+              )
+            );
             break;
           case "MIFARE":
             cardHandler = classic4K;
-            // authConfig = {
-            //   block: 28,
-            //   keyA: "A0A1A2A3A4A5",
-            //   keyB: "D7D8D9DADBDC"
-            // };
+            authConfig = {
+              block: 28,
+              keyA: "A0A1A2A3A4A5",
+              keyB: "D7D8D9DADBDC"
+            };
             break;
           case "MIFARE_DESFIRE":
             cardHandler = desfire;
             break;
           default:
-            throw new "UNKNOWN card type"();
+            throw "UNKNOWN card type";
         }
         if (nfcState.mode === "erease") {
-          //nfcState.mode = "reader";
+          nfcState.mode = "reader";
           cardHandler
             .authenticate(authConfig)
             .then(() => {
