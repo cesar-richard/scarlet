@@ -1,4 +1,8 @@
 const crypto = require("crypto");
+const READER_ACR122 = {
+  GET_DATAS: [0xff, 0xca, 0x00, 0x00, 0x00],
+  GET_MODEL__: [0xff, 0x00, 0x00, 0x00, 0x03, 0xd4, 0x42, 0x60]
+};
 module.exports = class Helper {
   static computeEV1PassAndPack(cardUid, gillEV1Password) {
     const hmacSignature = Buffer.from(
@@ -16,10 +20,15 @@ module.exports = class Helper {
 
   static async getCardModel({ reader, card }) {
     let cardModel = {};
-    const x = await reader.transmit(
-      Buffer.from([0xff, 0x00, 0x00, 0x00, 0x03, 0xd4, 0x42, 0x60]),
-      13
+    const x = await reader.transmit(Buffer.from(READER_ACR122.GET_MODEL__), 13);
+    const data = await reader.transmit(
+      Buffer.from(READER_ACR122.GET_DATAS),
+      40
     );
+    if (data.slice(-1)[0] !== 0x00) {
+      throw "Error getting card UID";
+    }
+    Object.assign(card, { uid: data.slice(0, -2).toString("hex") });
     if (x[4] === 4 && x[5] === 4) {
       cardModel.type = "NTAG";
       if (x[6] === 1 && x[7] === 1 && x[8] === 0 && x[9] === 11) {
@@ -55,11 +64,14 @@ module.exports = class Helper {
       if (card.type === "TAG_ISO_14443_4") {
         cardModel.type = "MIFARE_DESFIRE";
         cardModel.name = "DESFIRE_EV2";
+        delete card.data;
       }
     } else {
       cardModel.type = "UNKNOWN";
       cardModel.name = "UNKNOWN";
     }
-    return cardModel;
+    Object.assign(card, { model: cardModel });
+    delete card.atr;
+    return card;
   }
 };
