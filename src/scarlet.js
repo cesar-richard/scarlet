@@ -1,132 +1,142 @@
-const { NFC, KEY_TYPE_A, KEY_TYPE_B } = require("nfc-pcsc");
-
-const PORT = process.env.SOCKETPORT || 3001;
-const io = require("socket.io")(PORT);
-const Sentry = require("@sentry/node");
-const MifareUltralight = require("./Cards/MifareUltralight");
-const MifareClassic4K = require("./Cards/MifareClassic4K");
-const Helpers = require("./Cards/helpers");
+const fs = require('fs');
+const {NFC, CONNECT_MODE_DIRECT} = require("nfc-pcsc");
 const logger = require("./logger");
-
-Sentry.init({
-  dsn: "https://84064b30c0fe49abb7feb8baea032ca9@sentry.io/1793383"
-});
-
-const helpers = new Helpers();
-const nfc = new NFC(logger);
+const axios = require("axios");
+const Helpers = require("./helpers");
+const nfc = new NFC();
 const nfcState = {
-  reader: null,
-  connected: false,
-  mode: "erease"
+    reader: null,
+    connected: false,
+    sessionId: null
 };
-let cardHandler = null;
-const gillConfig = {};
 
-nfc.on("reader", reader => {
-  logger.info(`${reader.reader.name}  device attached`);
-  nfcState.connected = true;
-  nfcState.reader = reader.reader;
-  io.emit("start", reader.reader.name);
-  const ultralight = new MifareUltralight(reader);
-  const classic4K = new MifareClassic4K(reader);
+// For todays date;
+Date.prototype.today = function () { 
+    return ((this.getDate() < 10)?"0":"") + this.getDate() +"/"+(((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) +"/"+ this.getFullYear();
+}
 
-  reader.on("card", card => {
-    let authConfig = {};
-    Helpers.getCardModel(reader)
-      .then(model => {
-        Object.assign(card, { model });
-        switch (model.type) {
-          case "ULTRALIGHT":
-            cardHandler = ultralight;
-            if (!gillConfig.offline_ev1password)
-              throw new "Not yet got gill config"();
-            authConfig = {
-              startPage: 0x04,
-              endPage: 0x0f
-            };
-            Object.assign(
-              authConfig,
-              Helpers.computeEV1PassAndPack(
-                card.uid,
-                gillConfig.offline_ev1password
-              )
-            );
-            break;
-          case "MIFARE":
-            cardHandler = classic4K;
-            authConfig = {
-              block: 28,
-              keyA: "A0A1A2A3A4A5",
-              keyB: "D7D8D9DADBDC"
-            };
-            break;
-          default:
-            throw new "UNKNOWN card type"();
-        }
-        logger.error(JSON.stringify(authConfig));
-        if (nfcState.mode === "erease") {
-          nfcState.mode = "reader";
-          cardHandler
-            .authenticate(authConfig)
-            .then(() =>
-              cardHandler.reset(authConfig).then(data => {
-                cardHandler
-                  .fastRead(authConfig.startPage, authConfig.endPage)
-                  .then(data => logger.info("reset succeed ", data))
-                  .catch(warn => logger.error("reset failed ", warn));
-              })
-            )
-            .catch(e => logger.error);
-        }
-        io.emit("card", card);
-      })
-      .catch(error => logger.error("GET OLD : ", error));
-  });
+// For the time now
+Date.prototype.timeNow = function () {
+     return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+}
 
-  reader.on("card.off", card => {
-    io.emit("off", card);
-    logger.info(`${reader.reader.name}  card removed`, card);
-  });
+const login = () => {
+    return axios.post("https://api.nemopay.net/services/MYACCOUNT/login2?system_id=80405&app_key=0a93e8e18e6ed78fa50c4d74e949801b", {
+        login: "licorne@utc.fr", password: "r9222yda"
+    })
+}
 
-  reader.on("error", err => {
-    io.emit("error", err.toString());
-    logger.error(
-      `READER ${reader.reader.name} an error occurred`,
-      err.toString()
-    );
-  });
+const findWallet = (cardUid) => {
+    return axios.post("https://api.nemopay.net/services/GESUSERS/walletAutocomplete?system_id=80405&app_key=0a93e8e18e6ed78fa50c4d74e949801b&sessionid=" + nfcState.sessionId, {
+        queryString: cardUid, wallet_config: 1, lookup_only: "tag"
+    })
+}
 
-  reader.on("end", () => {
-    nfcState.connected = false;
-    nfcState.reader = null;
-    io.emit("end");
-    logger.info(`${reader.reader.name}  device removed`);
-  });
+const createPairing = (walletId) => {
+    return axios.post("https://api.nemopay.net/services/GESUSERS/createPairing?system_id=80405&app_key=0a93e8e18e6ed78fa50c4d74e949801b&sessionid=" + nfcState.sessionId, {
+        wallet: walletId, uid: null, short_tag: null
+    })
+}
+
+const processCard = (reader, card) => {
+    return findWallet(card.uid).then(wallet => {
+        logger.info("wallet", wallet.data[0])
+        return createPairing(wallet.data[0].id)
+            .then(pairing => {
+                logger.debug("pairing", pairing.data)
+		const newDate = new Date();
+		console.log(wallet.data[0]);
+		fs.writeFileSync('/tmp/logs.log', JSON.stringify({when: newDate.today() + " " + newDate.timeNow(), card: card.uid, wallet: wallet.data[0].id, username: wallet.data[0].username, name: wallet.data[0].name, email: wallet.data[0].email}) + ",\n",{ flag: 'a+' });
+            })
+            .catch(async e => {
+                logger.error("pairing", e.response.data.error)
+                throw e
+            });
+    }).catch(e => {
+        logger.error("wallet", e.response.data)
+        throw e
+    });
+}
+
+const ledError = async (reader) => {
+    await reader.led(0b01011101, [0x01, 0x01, 0x03, 0x02]);
+}
+
+const ledSuccess = async (reader) => {
+    await reader.led(0b00101110, [0x02, 0x07, 0x01, 0x07]);
+}
+
+nfc.on("reader", async reader => {
+    reader.aid = "F222222222";
+    logger.info(`${reader.reader.name}  device attached`);
+    nfcState.connected = true;
+    nfcState.reader = reader.reader;
+
+    try {
+        await reader.connect(CONNECT_MODE_DIRECT);
+        await reader.setBuzzerOutput(false);
+        await reader.disconnect();
+    } catch (err) {
+        console.info(`initial sequence error`, reader, err);
+    }
+
+    reader.on("card", async card => {
+        Helpers.getCardModel({reader, card})
+            .then(model => {
+                Object.assign(card, {model});
+                logger.debug("CARD : ", card)
+                processCard(reader, card)
+                    .then(async (e) => {
+                        await ledError(reader)
+                        console.log("Pairing succeed", e)
+                    })
+                    .catch(err => {
+                        if (err.response.data.error.code === '403') {
+                            console.log("Logged in")
+                            login().then(retlogin => {
+                                logger.debug("retLogin", retlogin.data)
+                                nfcState.sessionId = retlogin.data.sessionid;
+                                processCard(reader, card)
+                                    .then(async () => {
+                                        await ledSuccess(reader)
+                                        console.log("Pairing finally succeed")
+                                    })
+                                    .catch(async err => {
+                                        await ledError(reader)
+                                        console.error("process", err)
+                                    })
+                            }).catch(async e => {
+                                await ledError(reader)
+                                logger.error("login", e.response.data)
+                            });
+                        }
+                    })
+            }).catch(async e => {
+            logger.error("getCardModel", e)
+            await ledError(reader)
+        })
+    })
+
+    reader.on("card.off", async card => {
+        logger.info(`${reader.reader.name}  card removed`, card);
+    });
+
+    reader.on("error", err => {
+        logger.error(
+            `READER ${reader.reader.name} an error occurred`,
+            err.toString()
+        );
+    });
+
+    reader.on("end", () => {
+        nfcState.connected = false;
+        nfcState.reader = null;
+        logger.info(`${reader.reader.name}  device removed`);
+    });
 });
 
 nfc.on("nfcerror", err => {
-  io.emit("error", err.toString());
-  logger.error("an error occurred", err.toString());
+    io.emit("error", err.toString());
+    logger.error("an error occurred", err.toString());
 });
 
-io.on("connection", client => {
-  io.emit("getGillConfig");
-  logger.info("client connected");
-  if (nfcState.connected) {
-    io.emit("start", nfcState.reader.name);
-  } else {
-    io.emit("end");
-  }
-  client.on("subscribeToNFC", () => {
-    logger.info("client is subscribing to NFC events");
-  });
-  client.on("ereaseWallet", () => {
-    logger.debug("Erease mode");
-    logger.info("Erease mode");
-    nfcState.mode = "erease";
-  });
-  client.on("systemConfig", config => {
-    logger.debug("Got gill system config");
-    Object.assign(gillConfig, config);
-  });
-});
